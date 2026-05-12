@@ -6,7 +6,12 @@ books = {
     1: {"title": "DOS Guide", "stock": 5, "price": 50, "topic": "distributed systems"},
     2: {"title": "RPC for Noobs", "stock": 3, "price": 40, "topic": "distributed systems"},
     3: {"title": "Undergrad Survival", "stock": 7, "price": 30, "topic": "undergraduate"},
-    4: {"title": "Cooking Guide", "stock": 2, "price": 20, "topic": "undergraduate"}
+    4: {"title": "Cooking Guide", "stock": 2, "price": 20, "topic": "undergraduate"},
+
+    # ✅ الكتب الجديدة المطلوبة في Lab 2
+    5: {"title": "How to finish Project 3 on time", "stock": 10, "price": 60, "topic": "distributed systems"},
+    6: {"title": "Why theory classes are so hard", "stock": 8, "price": 55, "topic": "distributed systems"},
+    7: {"title": "Spring in the Pioneer Valley", "stock": 7, "price": 45, "topic": "distributed systems"}
 }
 
 @app.route('/info/<int:item_id>')
@@ -19,19 +24,19 @@ def info(item_id):
 @app.route('/purchase/<int:item_id>')
 def update_stock(item_id):
 
-   
     if item_id in books:
         if books[item_id]["stock"] > 0:
             books[item_id]["stock"] -= 1
 
             return jsonify({
-                "title": books[item_id]["title"],   # 👈 مهم جدًا
+                "title": books[item_id]["title"],
                 "stock": books[item_id]["stock"]
             })
 
         return jsonify({"error": "Out of stock"}), 400
 
     return jsonify({"error": "Not found"}), 404
+
 
 @app.route('/search/<topic>')
 def search(topic):
@@ -42,6 +47,7 @@ def search(topic):
             result[book["title"]] = id
 
     return jsonify(result)
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5001, debug=True)
