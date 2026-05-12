@@ -110,6 +110,7 @@ HTML = """
 
 @app.route('/')
 def home():
+
     books = {}
 
     try:
@@ -122,10 +123,13 @@ def home():
 
             # ✅ إذا موجود بالكاش
             if item_id in cache:
+                app.logger.warning(f"CACHE HIT: {item_id}")
                 info = cache[item_id]
 
-            # ❌ إذا مش موجود نجيبه من catalog
+            # ❌ إذا مش موجود بالكاش
             else:
+                app.logger.warning(f"CACHE MISS: {item_id}")
+
                 info = requests.get(
                     f"{CATALOG_URL}/info/{item_id}",
                     timeout=3
@@ -149,6 +153,7 @@ def home():
         ).json()
 
         orders = {}
+
         for order in raw_orders:
             title = order.get("title", "Unknown")
 
@@ -161,16 +166,22 @@ def home():
         print("❌ Error fetching orders:", e)
         orders = {}
 
-    return render_template_string(HTML, books=books, orders=orders)
+    return render_template_string(
+        HTML,
+        books=books,
+        orders=orders
+    )
 
 
 @app.route('/buy/<int:item_id>')
 def buy(item_id):
+
     try:
         requests.get(
             f"{ORDER_URL}/purchase/{item_id}",
             timeout=3
         )
+
     except Exception as e:
         print("❌ Purchase error:", e)
 
