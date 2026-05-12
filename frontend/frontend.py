@@ -6,6 +6,9 @@ app = Flask(__name__)
 CATALOG_URL = "http://catalog:5001"
 ORDER_URL = "http://order:5002"
 
+# ✅ Cache for books
+cache = {}
+
 HTML = """
 <!DOCTYPE html>
 <html>
@@ -116,10 +119,19 @@ def home():
         ).json()
 
         for title, item_id in results.items():
-            info = requests.get(
-                f"{CATALOG_URL}/info/{item_id}",
-                timeout=3
-            ).json()
+
+            # ✅ إذا موجود بالكاش
+            if item_id in cache:
+                info = cache[item_id]
+
+            # ❌ إذا مش موجود نجيبه من catalog
+            else:
+                info = requests.get(
+                    f"{CATALOG_URL}/info/{item_id}",
+                    timeout=3
+                ).json()
+
+                cache[item_id] = info
 
             books[item_id] = {
                 "title": info.get("title", "Unknown"),
